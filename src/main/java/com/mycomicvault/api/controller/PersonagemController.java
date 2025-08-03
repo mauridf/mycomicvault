@@ -4,6 +4,10 @@ import com.mycomicvault.api.dto.PersonagemDTO;
 import com.mycomicvault.api.mapper.PersonagemMapper;
 import com.mycomicvault.application.service.PersonagemService;
 import com.mycomicvault.domain.entity.Personagem;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -22,11 +26,21 @@ public class PersonagemController {
     }
 
     @GetMapping
-    public ResponseEntity<List<PersonagemDTO>> listar() {
-        List<PersonagemDTO> dtos = personagemService.listarTodas()
-                .stream()
-                .map(PersonagemMapper::toDTO)
-                .toList();
+    public ResponseEntity<Page<PersonagemDTO>> listar(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "name") String sort,
+            @RequestParam(defaultValue = "") String search) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
+        Page<Personagem> personagens;
+
+        if (search.isEmpty()) {
+            personagens = personagemService.listarTodas(pageable);
+        } else {
+            personagens = personagemService.buscarPorNome(search, pageable);
+        }
+
+        Page<PersonagemDTO> dtos = personagens.map(PersonagemMapper::toDTO);
         return ResponseEntity.ok(dtos);
     }
 

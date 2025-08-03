@@ -2,6 +2,8 @@ package com.mycomicvault.application.service;
 
 import com.mycomicvault.domain.entity.Edicao;
 import com.mycomicvault.domain.repository.EdicaoRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,8 +18,12 @@ public class EdicaoService {
         this.edicaoRepository = edicaoRepository;
     }
 
-    public List<Edicao> listarTodas() {
-        return edicaoRepository.findAll();
+    public Page<Edicao> listarTodas(Pageable pageable) {
+        return edicaoRepository.findAll(pageable);
+    }
+
+    public Page<Edicao> buscarPorNome(String searchTerm, Pageable pageable) {
+        return edicaoRepository.search(searchTerm, pageable);
     }
 
     public Optional<Edicao> buscarPorId(UUID id) {

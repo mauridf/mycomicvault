@@ -1,7 +1,17 @@
 package com.mycomicvault.domain.repository;
 
 import com.mycomicvault.domain.entity.Edicao;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
 import java.util.UUID;
 
-public interface EdicaoRepository extends JpaRepository<Edicao, UUID> {}
+public interface EdicaoRepository extends JpaRepository<Edicao, UUID> {
+    @Query("SELECT e FROM Edicao e WHERE " +
+            "LOWER(e.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+            "LOWER(e.aliases) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
+    Page<Edicao> search(@Param("searchTerm") String searchTerm, Pageable pageable);
+}

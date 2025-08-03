@@ -1,7 +1,10 @@
 package com.mycomicvault.application.service;
 
+import com.mycomicvault.domain.entity.Equipe;
 import com.mycomicvault.domain.entity.HQ;
 import com.mycomicvault.domain.repository.HQRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,8 +20,12 @@ public class HQService {
         this.hqRepository = hqRepository;
     }
 
-    public List<HQ> listarTodas() {
-        return hqRepository.findAll();
+    public Page<HQ> listarTodas(Pageable pageable) {
+        return hqRepository.findAll(pageable);
+    }
+
+    public Page<HQ> buscarPorNome(String searchTerm, Pageable pageable) {
+        return hqRepository.search(searchTerm, pageable);
     }
 
     public Optional<HQ> buscarPorId(UUID id) {

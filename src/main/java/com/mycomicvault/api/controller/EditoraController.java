@@ -31,7 +31,6 @@ public class EditoraController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "name") String sort,
             @RequestParam(defaultValue = "") String search) {
-
         Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
         Page<Editora> editoras;
 

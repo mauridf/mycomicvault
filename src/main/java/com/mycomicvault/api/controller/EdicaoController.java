@@ -1,10 +1,17 @@
 package com.mycomicvault.api.controller;
 
 import com.mycomicvault.api.dto.EdicaoDTO;
+import com.mycomicvault.api.dto.HQDTO;
 import com.mycomicvault.api.mapper.EdicaoMapper;
+import com.mycomicvault.api.mapper.HQMapper;
 import com.mycomicvault.application.service.EdicaoService;
 import com.mycomicvault.domain.entity.Edicao;
 import com.mycomicvault.application.service.FileStorageService;
+import com.mycomicvault.domain.entity.HQ;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -27,11 +34,21 @@ public class EdicaoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<EdicaoDTO>> listar() {
-        List<EdicaoDTO> dtos = edicaoService.listarTodas()
-                .stream()
-                .map(EdicaoMapper::toDTO)
-                .toList();
+    public ResponseEntity<Page<EdicaoDTO>> listar(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "name") String sort,
+            @RequestParam(defaultValue = "") String search) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
+        Page<Edicao> edicoes;
+
+        if (search.isEmpty()) {
+            edicoes = edicaoService.listarTodas(pageable);
+        } else {
+            edicoes = edicaoService.buscarPorNome(search, pageable);
+        }
+
+        Page<EdicaoDTO> dtos = edicoes.map(EdicaoMapper::toDTO);
         return ResponseEntity.ok(dtos);
     }
 
